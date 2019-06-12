@@ -20,7 +20,9 @@ import com.rabbitmq.client.AMQP;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -28,14 +30,27 @@ public class RabbitMQSinkHeaderParser {
   private static final String HEADER_SEPARATOR = ",";
   private static final String KEY_VALUE_SEPARATOR = ":";
 
+
+  private static final Map<String,Object> DEFAULT_HEADERS = new HashMap<>();
+  static {
+    DEFAULT_HEADERS.put("JMSExpiration",0);
+    DEFAULT_HEADERS.put("JMSMessageID", UUID.randomUUID().toString());
+    DEFAULT_HEADERS.put("JMSPriority",4);
+    DEFAULT_HEADERS.put("JMSTimestamp",System.currentTimeMillis());
+    DEFAULT_HEADERS.put("JMSType","TextMessage");
+
+  }
+
   static AMQP.BasicProperties parse(final String headerConfig) {
-    if (headerConfig == null)
-          return null;
-    final Map<String, Object> heaaders = Arrays.stream(headerConfig.split(HEADER_SEPARATOR))
-            .map(header -> header.split(KEY_VALUE_SEPARATOR))
-            .map(Pair::apply)
-            .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
-    return new AMQP.BasicProperties.Builder().headers(heaaders).build();
+    final Map<String,Object> headerTemp = new HashMap<>(DEFAULT_HEADERS);
+    if (headerConfig != null) {
+      final Map<String, Object> headers = Arrays.stream(headerConfig.split(HEADER_SEPARATOR))
+              .map(header -> header.split(KEY_VALUE_SEPARATOR))
+              .map(Pair::apply)
+              .collect(Collectors.toMap(Pair::getKey, Pair::getValue));
+      headers.forEach((k,v) -> headerTemp.merge(k,v,(o,n) -> n));
+    }
+    return new AMQP.BasicProperties.Builder().headers(headerTemp).build();
   }
 
   private static final class Pair<K, V> extends AbstractMap.SimpleEntry<K, V> {
