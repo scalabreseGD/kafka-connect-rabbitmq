@@ -78,6 +78,8 @@ public class RabbitMQSinkTask extends SinkTask {
     try {
       log.info("Creating Channel");
       this.channel = this.connection.createChannel();
+      log.info("Declaring queue");
+      this.channel.queueDeclare(this.config.routingKey, true, false, false, null);
     } catch (IOException e) {
       throw new ConnectException(e);
     }
