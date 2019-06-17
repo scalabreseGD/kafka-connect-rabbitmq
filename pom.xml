@@ -9,7 +9,7 @@
         <version>1.0.0</version>
     </parent>
     <artifactId>kafka-connect-rabbitmq</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.2-SIMON</version>
     <name>kafka-connect-rabbitmq</name>
     <description>A Kafka Connect connector reading and writing data from RabbitMQ.</description>
     <url>https://github.com/jcustenborder/kafka-connect-rabbitmq</url>
@@ -54,9 +54,38 @@
             <artifactId>connect-utils-testing-data</artifactId>
             <version>${connect-utils.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.avro</groupId>
+            <artifactId>avro</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.confluent</groupId>
+            <artifactId>kafka-avro-serializer</artifactId>
+            <version>5.1.0</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble-all</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-connect-maven-plugin</artifactId>
