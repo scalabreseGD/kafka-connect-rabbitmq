@@ -79,9 +79,9 @@
     </build>
 
     <scm>
-        <connection>scm:git:https://github.com/griddynamics/kafka-connect-rabbitmq.git</connection>
-        <developerConnection>scm:git:https://github.com/griddynamics/kafka-connect-rabbitmq.git</developerConnection>
-        <url>scm:git:https://github.com/griddynamics/kafka-connect-rabbitmq.git</url>
+        <connection>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</connection>
+        <developerConnection>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</developerConnection>
+        <url>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</url>
         <tag>HEAD</tag>
     </scm>
 
