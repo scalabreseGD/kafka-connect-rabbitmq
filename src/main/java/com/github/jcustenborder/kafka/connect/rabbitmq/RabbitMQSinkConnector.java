@@ -24,14 +24,10 @@ import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.sink.SinkConnector;
 
-import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
-import com.github.jcustenborder.kafka.connect.utils.config.Description;
-
-@Description("Connector is used to read data from a Kafka topic and publish it on a RabbitMQ exchange and routing key pair.")
 public class RabbitMQSinkConnector extends SinkConnector {
   Map<String, String> settings;
   RabbitMQSinkConnectorConfig config;
-  
+  public static String VERSION = "0.0.3";
 
 
   @Override
@@ -67,7 +63,7 @@ public class RabbitMQSinkConnector extends SinkConnector {
 
   @Override
   public String version() {
-    return VersionUtil.version(this.getClass());
+    return VERSION;
   }
 
 }
