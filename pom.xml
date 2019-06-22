@@ -15,7 +15,7 @@
     </parent>
 
     <artifactId>kafka-connect-rabbitmq</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>kafka-connect-rabbitmq</name>
     <description>A Kafka Connect connector reading and writing data from RabbitMQ.</description>
 
@@ -82,7 +82,7 @@
         <connection>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</connection>
         <developerConnection>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</developerConnection>
         <url>scm:git:git@github.com:griddynamics/kafka-connect-rabbitmq.git</url>
-        <tag>HEAD</tag>
+        <tag>kafka-connect-rabbitmq-0.0.1</tag>
     </scm>
 
 </project>
