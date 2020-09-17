@@ -1,0 +1,62 @@
+#!/usr/bin/env groovy
+
+// Jenkins ssh key credential
+def jenkins_credential_id = 'git'
+
+// Git user and email for commits by release plugin
+def git_username = 'jenkins_aduno_poc'
+def git_email = 'jenkins_aduno_poc@griddynamics.com'
+
+// SCM parameters
+def git_url = 'git@github.com:griddynamics/kafka-connect-rabbitmq.git'
+
+// maven tool version
+def maven_version = 'M3'
+
+pipeline {
+    agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '40', artifactNumToKeepStr: '1'))
+        timestamps()
+        skipDefaultCheckout true
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout([ $class: 'GitSCM',
+                    branches: [[name: 'master']],
+                    userRemoteConfigs: [[
+                        credentialsId: jenkins_credential_id,
+                        url: git_url
+                    ]],
+                    extensions: [[
+                        $class: 'LocalBranch'
+                    ]]
+                ])
+            }
+        }
+        stage('BuildRelease') {
+            steps {
+                withMaven(
+                    maven: maven_version,
+                    jdk: 'JDK8.192',
+                    mavenSettingsConfig: 'jfrog-settings') {
+                      script {
+                          def pom = readMavenPom file: 'pom.xml'
+                          def version = (pom.version =~ /(.*)-SNAPSHOT/)[0][1]
+                          currentBuild.description = "VERSION: ${version}"
+                      }
+                      sh "git config user.email ${git_email}"
+                      sh "git config user.name ${git_username}"
+                      sh "mvn -B -Dresume=false -DdryRun=true release:prepare"
+                      sh "mvn -B -Dresume=false release:prepare release:perform -DscmCommentPrefix='[skip ci] '"
+                  }
+            }
+        }
+    }
+    post {
+        always {
+            deleteDir()
+        }
+    }
+}
