@@ -56,7 +56,7 @@ public class RabbitMQSourceTask extends SourceTask {
     ConnectionFactory connectionFactory = this.config.connectionFactory();
     try {
       log.info("Opening connection to {}:{}/{}", this.config.host, this.config.port, this.config.virtualHost);
-      this.connection = connectionFactory.newConnection();
+      this.connection = connectionFactory.newConnection(this.config.connectionName);
     } catch (IOException | TimeoutException e) {
       throw new ConnectException(e);
     }

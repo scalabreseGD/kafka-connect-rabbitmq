@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
+import static com.github.jcustenborder.kafka.connect.rabbitmq.RabbitMQConnectorConfig.CONNECTION_NAME;
 import static com.github.jcustenborder.kafka.connect.rabbitmq.RabbitMQSinkConnectorConfig.HEADER_CONF;
 
 public class RabbitMQSinkTask extends SinkTask {
@@ -70,7 +71,7 @@ public class RabbitMQSinkTask extends SinkTask {
     ConnectionFactory connectionFactory = this.config.connectionFactory();
     try {
       log.info("Opening connection to {}:{}/{}", this.config.host, this.config.port, this.config.virtualHost);
-      this.connection = connectionFactory.newConnection();
+      this.connection = connectionFactory.newConnection(this.config.connectionName);
     } catch (IOException | TimeoutException e) {
       throw new ConnectException(e);
     }
