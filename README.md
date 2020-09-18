@@ -171,9 +171,14 @@ Set the shutdown timeout. This is the amount of time that Consumer implementatio
 
 *Default Value:* true
 
+##### `rabbitmq.connection.name`
+*Importance:* Medium
 
-Enables or disables topology recovery. See `ConnectionFactory.setTopologyRecoveryEnabled(boolean) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setTopologyRecoveryEnabled-boolean->`_
+*Type:* String
 
+*Default Value:* null
+
+RabbitMQ connection name passed as ConnectionProperties
 #### Examples
 
 ##### Standalone Example
@@ -379,6 +384,15 @@ Set the shutdown timeout. This is the amount of time that Consumer implementatio
 *Type:* Boolean
 
 *Default Value:* true
+
+##### `rabbitmq.connection.name`
+*Importance:* Medium
+
+*Type:* String
+
+*Default Value:* null
+
+RabbitMQ connection name passed as ConnectionProperties
 
 
 Enables or disables topology recovery. See `ConnectionFactory.setTopologyRecoveryEnabled(boolean) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setTopologyRecoveryEnabled-boolean->`_
