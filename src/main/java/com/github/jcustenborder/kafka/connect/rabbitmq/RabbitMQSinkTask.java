@@ -36,63 +36,63 @@ import static com.github.jcustenborder.kafka.connect.rabbitmq.RabbitMQConnectorC
 import static com.github.jcustenborder.kafka.connect.rabbitmq.RabbitMQSinkConnectorConfig.HEADER_CONF;
 
 public class RabbitMQSinkTask extends SinkTask {
-  private static final Logger log = LoggerFactory.getLogger(RabbitMQSourceTask.class);
-  RabbitMQSinkConnectorConfig config;
+    private static final Logger log = LoggerFactory.getLogger(RabbitMQSourceTask.class);
+    RabbitMQSinkConnectorConfig config;
 
-  Channel channel;
-  Connection connection;
+    Channel channel;
+    Connection connection;
 
 
-  @Override
-  public String version() {
-    return VersionUtil.version(this.getClass());
-  }
-
-  @Override
-  public void put(Collection<SinkRecord> sinkRecords) {
-    for (SinkRecord record : sinkRecords) {
-      log.trace("current sinkRecord value: " + record.value());
-      if (!(record.value() instanceof byte[])) {
-        throw new ConnectException("the value of the record has an invalid type (must be of type byte[])");
-      }
-      try {
-        channel.basicPublish(this.config.exchange, this.config.routingKey,
-              RabbitMQSinkHeaderParser.parse(config.getString(HEADER_CONF)), (byte[]) record.value());
-      } catch (IOException e) {
-        log.error("There was an error while publishing the outgoing message to RabbitMQ");
-        throw new RetriableException(e);
-      }
-    }
-  }
-
-  @Override
-  public void start(Map<String, String> settings) {
-    this.config = new RabbitMQSinkConnectorConfig(settings);
-    ConnectionFactory connectionFactory = this.config.connectionFactory();
-    try {
-      log.info("Opening connection to {}:{}/{}", this.config.host, this.config.port, this.config.virtualHost);
-      this.connection = connectionFactory.newConnection(this.config.connectionName);
-    } catch (IOException | TimeoutException e) {
-      throw new ConnectException(e);
+    @Override
+    public String version() {
+        return VersionUtil.version(this.getClass());
     }
 
-    try {
-      log.info("Creating Channel");
-      this.channel = this.connection.createChannel();
-      log.info("Declaring queue");
-      this.channel.queueDeclare(this.config.routingKey, true, false, false, null);
-    } catch (IOException e) {
-      throw new ConnectException(e);
+    @Override
+    public void put(Collection<SinkRecord> sinkRecords) {
+        for (SinkRecord record : sinkRecords) {
+            log.trace("current sinkRecord value: " + record.value());
+            if (!(record.value() instanceof byte[])) {
+                throw new ConnectException("the value of the record has an invalid type (must be of type byte[])");
+            }
+            try {
+                channel.basicPublish(this.config.exchange, this.config.routingKey,
+                        RabbitMQSinkHeaderParser.parse(config.getString(HEADER_CONF)), (byte[]) record.value());
+            } catch (IOException e) {
+                log.error("There was an error while publishing the outgoing message to RabbitMQ");
+                throw new RetriableException(e);
+            }
+        }
     }
-  }
 
-  @Override
-  public void stop() {
-    try {
-      this.connection.close();
-    } catch (IOException e) {
-      log.error("Exception thrown while closing connection.", e);
+    @Override
+    public void start(Map<String, String> settings) {
+        this.config = new RabbitMQSinkConnectorConfig(settings);
+        ConnectionFactory connectionFactory = this.config.connectionFactory();
+        try {
+            log.info("Opening connection to {}:{}/{}", this.config.host, this.config.port, this.config.virtualHost);
+            this.connection = connectionFactory.newConnection(this.config.connectionName);
+        } catch (IOException | TimeoutException e) {
+            throw new ConnectException(e);
+        }
+
+        try {
+            log.info("Creating Channel");
+            this.channel = this.connection.createChannel();
+            log.info("Declaring queue");
+            this.channel.queueDeclare(this.config.routingKey, true, false, false, this.config.queueArgs);
+        } catch (IOException e) {
+            throw new ConnectException(e);
+        }
     }
-  }
+
+    @Override
+    public void stop() {
+        try {
+            this.connection.close();
+        } catch (IOException e) {
+            log.error("Exception thrown while closing connection.", e);
+        }
+    }
 
 }

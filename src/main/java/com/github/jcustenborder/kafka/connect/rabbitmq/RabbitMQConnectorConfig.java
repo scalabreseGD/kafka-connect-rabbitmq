@@ -22,6 +22,7 @@ import org.apache.kafka.common.config.ConfigDef;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.Map;
 
 class RabbitMQConnectorConfig extends AbstractConfig {
@@ -41,6 +42,8 @@ class RabbitMQConnectorConfig extends AbstractConfig {
     public static final String HOST_CONFIG = RABBITMQ_PREFX + "host";
     public static final String PORT_CONFIG = RABBITMQ_PREFX + "port";
     public static final String URI_CONFIG = RABBITMQ_PREFX + "uri";
+
+    public static final String QUEUE_TYPE_CONFIG = RABBITMQ_PREFX + "queue.type";
     public static final String CONNECTION_NAME = RABBITMQ_PREFX + "connection.name";
     static final String HOST_DOC = "The RabbitMQ host to connect to. See `ConnectionFactory.setHost(java.lang.String) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setHost-java.lang.String->`_";
     static final String USERNAME_DOC = "The username to authenticate to RabbitMQ with. See `ConnectionFactory.setUsername(java.lang.String) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setUsername-java.lang.String->`_";
@@ -65,6 +68,7 @@ class RabbitMQConnectorConfig extends AbstractConfig {
     static final String NETWORK_RECOVERY_INTERVAL_DOC = "See `ConnectionFactory.setNetworkRecoveryInterval(long) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setNetworkRecoveryInterval-long->`_";
     static final String PORT_DOC = "The RabbitMQ port to connect to. See `ConnectionFactory.setPort(int) <https://www.rabbitmq.com/releases/rabbitmq-java-client/current-javadoc/com/rabbitmq/client/ConnectionFactory.html#setPort-int->`_";
     static final String URI_DOC = "RabbitMQ uri with ssl support. Example amqp://hostName:portNumber/virtualHost";
+    static final String QUEUE_TYPE_DOC = "Value to pass in scope of queue type in the connection factory (example: 'none' (in case of null)  or 'quorum')";
     static final String CONNECTION_NAME_DOC = "RabbitMQ connection name passed as ConnectionProperties";
     public final String username;
     public final String password;
@@ -81,8 +85,10 @@ class RabbitMQConnectorConfig extends AbstractConfig {
     public final String host;
     public final int port;
     public final String uri;
+    public final Map<String,Object> queueArgs;
     public final String connectionName;
     public final ConnectionFactory connectionFactory;
+
 
 
     public RabbitMQConnectorConfig(ConfigDef definition, Map<?, ?> originals) {
@@ -102,6 +108,8 @@ class RabbitMQConnectorConfig extends AbstractConfig {
         this.host = this.getString(HOST_CONFIG);
         this.port = this.getInt(PORT_CONFIG);
         this.uri = this.getString(URI_CONFIG);
+        //added as hardcoded behaviour in case of quorum type
+        this.queueArgs = Collections.singletonMap("x-queue-type", this.getString(QUEUE_TYPE_CONFIG));
         this.connectionName = this.getString(CONNECTION_NAME);
         this.connectionFactory = connectionFactory();
     }
@@ -123,6 +131,7 @@ class RabbitMQConnectorConfig extends AbstractConfig {
                 .define(NETWORK_RECOVERY_INTERVAL_CONFIG, ConfigDef.Type.INT, 10000, ConfigDef.Importance.LOW, NETWORK_RECOVERY_INTERVAL_DOC)
                 .define(PORT_CONFIG, ConfigDef.Type.INT, ConnectionFactory.DEFAULT_AMQP_PORT, ConfigDef.Importance.MEDIUM, PORT_DOC)
                 .define(URI_CONFIG, ConfigDef.Type.STRING, null, ConfigDef.Importance.MEDIUM, URI_DOC)
+                .define(QUEUE_TYPE_CONFIG, ConfigDef.Type.STRING, "none", ConfigDef.Importance.LOW, QUEUE_TYPE_DOC)
                 .define(CONNECTION_NAME, ConfigDef.Type.STRING, null, ConfigDef.Importance.MEDIUM, CONNECTION_NAME_DOC);
     }
 
